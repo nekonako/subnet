@@ -12,5 +12,5 @@ sudo ./install.sh
 # how to use
 
 ```bash
-sunnet 192.168.1.1/24
+subnet 192.168.1.1/24
 ```
