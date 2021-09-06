@@ -4,6 +4,8 @@ subnetting via command line
 # installation
 
 ```bash
+git clone https://github.com/nekonako/subnet
+cd sunbet
 sudo ./install.sh
 ```
 
