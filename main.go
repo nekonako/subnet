@@ -11,32 +11,43 @@ import (
 func main() {
 	var ip = os.Args[1]
 
-	address, prefix, totalAddr, networkAddr, hostAddr, broadcastAddr := classC(ip)
+	address, prefix, totalAddr, networkAddr, hostAddr, broadcastAddr := calc(ip)
 
-	fmt.Println("ip address :        ", address)
-	fmt.Println("prefix :            ", prefix)
-	fmt.Println("total address :     ", totalAddr)
-	fmt.Println("network address :")
+	fmt.Println("")
+	fmt.Println("ip address           :", address)
+	fmt.Println("prefix               :", prefix)
+	fmt.Println("total address        :", totalAddr)
+	fmt.Println("network address      :")
 	for _, value := range networkAddr {
-		fmt.Println("                    ", value)
+		fmt.Println("                      ", value)
 	}
-	fmt.Println("host address :")
+	fmt.Println("host address         :")
 	for _, value := range hostAddr {
-		fmt.Println("                    ", value)
+		fmt.Println("                      ", value)
 	}
-	fmt.Println("broadcast address :")
+	fmt.Println("broadcast address    :")
 	for _, value := range broadcastAddr {
-		fmt.Println("                    ", value)
+		fmt.Println("                      ", value)
 	}
 }
 
-func splitAddress(ip string) (address string, prefix int) {
+func splitAddress(ip string) (address string, prefix int, class string) {
 	split := strings.Split(ip, "/")
 	if len(split) <= 1 {
 		panic(fmt.Errorf("Error : prefix not found"))
 	}
 	prefix, _ = strconv.Atoi(split[1])
-	return split[0], prefix
+	if prefix >= 24 && prefix <= 30 {
+		class = "c"
+	} else if prefix >= 16 && prefix <= 30 {
+		class = "b"
+	} else if prefix >= 8 && prefix <= 30 {
+		class = "a"
+	} else {
+		fmt.Println("Prefix must range of 8 - 30")
+		panic("ip address class not found")
+	}
+	return split[0], prefix, class
 }
 
 func splitIp(ip string, class string) (subnet string) {
@@ -104,23 +115,9 @@ func getBroadcasAddress(subnetBlock int, networkAddr []int) (broadcastAddr []int
 	return broadcastAddr
 }
 
-func getClass(ip string) (class string) {
-	_, prefix := splitAddress(ip)
-	if prefix >= 24 {
-		return "c"
-	} else if prefix >= 16 {
-		return "b"
-	} else if prefix >= 8 {
-		return "a"
-	} else {
-		panic("ip address class not found")
-	}
-}
+func calc(ip string) (address string, prefix int, totalAddr float64, networkAddr []string, hostAddr []string, broadcastAddr []string) {
 
-func classC(ip string) (address string, prefix int, totalAddr float64, networkAddr []string, hostAddr []string, broadcastAddr []string) {
-
-	address, prefix = splitAddress(ip)
-	class := getClass(ip)
+	address, prefix, class := splitAddress(ip)
 	totalAddr = math.Pow(2, float64(32-prefix))
 	subnetBlock := subnetBlock(prefix)
 	subnet := splitIp(address, class)
