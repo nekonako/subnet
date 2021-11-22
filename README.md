@@ -1,9 +1,9 @@
-##  # Subnet #
-<center>subnetting via command line</center>
+<h4 align="center">Subnet</h4>
+<p align="center">subnetting via command line</p>
 
-## installation
+#### installation
 
-#### intall from binary file
+<b>intall from binary file</b>
 
 ```bash
 git clone https://github.com/nekonako/subnet.git
@@ -11,7 +11,7 @@ cd subnet
 sudo ./install.sh
 ```
 
-#### build manualy
+<b>self build</b>
 
 ```bash
 git clone https://github.com/nekonako/subnet.git
@@ -19,14 +19,14 @@ cd subnet
 go build 
 ```
 
-## how to use
+<b>how to use</b>
 
 ```bash
 subnet 192.168.1.1/24
 ```
 
-## image
+<b>screenshoot</b>
 
 <p align="center">
-  <img width="50%" src="./shot.png" />
+  <img src="./shot.png" />
 </p>
