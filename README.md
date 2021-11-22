@@ -1,4 +1,4 @@
-<h4 align="center">Subnet</h4>
+<h3 align="center">Subnet</h3>
 <p align="center">subnetting via command line</p>
 
 #### installation
