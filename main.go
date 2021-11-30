@@ -8,10 +8,15 @@ import (
 	"strings"
 )
 
+type Subnet struct {
+	ip string
+}
+
 func main() {
 	var ip = os.Args[1]
 
-	address, prefix, totalAddr, networkAddr, hostAddr, broadcastAddr := calc(ip)
+	subnet := Subnet{ip: ip}
+	address, prefix, totalAddr, networkAddr, hostAddr, broadcastAddr := subnet.calc(ip)
 
 	fmt.Println("")
 	fmt.Println("ip address           :", address)
@@ -31,12 +36,15 @@ func main() {
 	}
 }
 
-func splitAddress(ip string) (address string, prefix int, class string) {
+func (s Subnet) splitIp(ip string) (addres string, prefix int, class string) {
 	split := strings.Split(ip, "/")
+
 	if len(split) <= 1 {
 		panic(fmt.Errorf("Error : prefix not found"))
 	}
+
 	prefix, _ = strconv.Atoi(split[1])
+
 	if prefix >= 24 && prefix <= 30 {
 		class = "c"
 	} else if prefix >= 16 && prefix <= 30 {
@@ -47,11 +55,13 @@ func splitAddress(ip string) (address string, prefix int, class string) {
 		fmt.Println("Prefix must range of 8 - 30")
 		panic("ip address class not found")
 	}
+
 	return split[0], prefix, class
+
 }
 
-func splitIp(ip string, class string) (subnet string) {
-	addr := strings.Split(ip, ".")
+func (s Subnet) splitAddress(address string, class string) (subnet string) {
+	addr := strings.Split(address, ".")
 	if class == "c" {
 		subnet = addr[0] + "." + addr[1] + "." + addr[2]
 	} else if class == "b" {
@@ -62,7 +72,7 @@ func splitIp(ip string, class string) (subnet string) {
 	return subnet
 }
 
-func subnetBlock(prefix int) int {
+func (s Subnet) subnetBlock(prefix int) int {
 	var bitList = [8]int{0, 128, 64, 32, 16, 8, 4, 2}
 	var number int
 	if prefix >= 24 {
@@ -86,7 +96,7 @@ func subnetBlock(prefix int) int {
 	return 256 - number
 }
 
-func getNetworkAddress(subnetBlock int) (networkAddr []int) {
+func (s Subnet) getNetworkAddress(subnetBlock int) (networkAddr []int) {
 	for i := 0; i < 255; i++ {
 		networkAddr = append(networkAddr, i)
 		i += int(subnetBlock - 1)
@@ -94,7 +104,7 @@ func getNetworkAddress(subnetBlock int) (networkAddr []int) {
 	return networkAddr
 }
 
-func getHostAddress(subnetBlock int, networkAddr []int) (hostAddr [][]int) {
+func (s Subnet) getHostAddress(subnetBlock int, networkAddr []int) (hostAddr [][]int) {
 	for _, val := range networkAddr {
 		var blok []int
 		for i := val + 1; i < val+subnetBlock; i++ {
@@ -105,7 +115,7 @@ func getHostAddress(subnetBlock int, networkAddr []int) (hostAddr [][]int) {
 	return hostAddr
 }
 
-func getBroadcasAddress(subnetBlock int, networkAddr []int) (broadcastAddr []int) {
+func (s Subnet) getBroadcasAddress(subnetBlock int, networkAddr []int) (broadcastAddr []int) {
 	for _, val := range networkAddr {
 		if val != 0 {
 			broadcastAddr = append(broadcastAddr, val-1)
@@ -115,15 +125,15 @@ func getBroadcasAddress(subnetBlock int, networkAddr []int) (broadcastAddr []int
 	return broadcastAddr
 }
 
-func calc(ip string) (address string, prefix int, totalAddr float64, networkAddr []string, hostAddr []string, broadcastAddr []string) {
+func (s Subnet) calc(ip string) (address string, prefix int, totalAddr float64, networkAddr []string, hostAddr []string, broadcastAddr []string) {
 
-	address, prefix, class := splitAddress(ip)
+	address, prefix, class := s.splitIp(ip)
 	totalAddr = math.Pow(2, float64(32-prefix))
-	subnetBlock := subnetBlock(prefix)
-	subnet := splitIp(address, class)
-	network := getNetworkAddress(subnetBlock)
-	host := getHostAddress(subnetBlock, network)
-	broadcast := getBroadcasAddress(subnetBlock, network)
+	subnetBlock := s.subnetBlock(prefix)
+	subnet := s.splitAddress(address, class)
+	network := s.getNetworkAddress(subnetBlock)
+	host := s.getHostAddress(subnetBlock, network)
+	broadcast := s.getBroadcasAddress(subnetBlock, network)
 
 	for _, value := range network {
 		if class == "c" {
